@@ -1,12 +1,8 @@
 %Interpolacion de newton
 clear;clc;
-disp('metodos numericos');
-disp('interpolacion');
-disp('interpolacion');
-n=input('ingrese el grado del polinomio, n=');
+n=input('ingrese la cantidad de puntos:, n=')-1;
 prog_o_reg=input('ingrese 1 para newton progresivo o 0 para newton regresivo, prog_o_reg=');
-fprintf('Se necesitan %.0f puntos\n',n+1);
-disp('ingrese los puntos');
+fprintf('Ingrese los %.0f puntos\n',n+1);
 for i=1:n+1
     fprintf('x%.0f=',i-1);
     X(i)=input(' ');
@@ -39,9 +35,16 @@ for i=1:n
 end
 polnew=expand(polnew);
 pretty(polnew);
-x=input('ingrese el valor de x a interpolar,x=');
-vi=eval(polnew);
-fprintf('el valor interpolado es %.2f\n',vi);
-hold on;
-ezplot(polnew,[X(1) X(n+1)]);
-plot(x,vi,'r+');
+%x=input('ingrese el valor de x a interpolar,x=');
+%vi=eval(polnew);
+%fprintf('el valor interpolado es %.2f\n',vi);
+
+    %Especializar el polinomio en un punto K:
+    opc=input('\nDesea aproximar un valor (si/no): ','s');
+    if strcmp(opc,'si')
+     x=input('\nIngrese el punto a aproximar: ');
+     y=eval(polnew); %evaluar el punto en el polinomio
+     fprintf('La aproximacion a f(x) es:')
+     disp(y)
+    end
+
