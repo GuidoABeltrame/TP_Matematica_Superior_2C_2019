@@ -1,5 +1,8 @@
 %FINTER - TP INTERPOLACIÓN
-
+clc %Borra el area de trabajo
+clear %borra las variables almacenadas
+fin='no';
+while fin == "no"
 clc %Borra el area de trabajo
 clear %borra las variables almacenadas
 format long %permite utilizar la máxima capacidad de la máquina
@@ -10,15 +13,15 @@ fprintf('FINTER\n\n');
 xi=input('Ingrese los puntos pertenecientes a las x: ');
 yi=input('Ingrese los puntos pertenecientes a las y: ');
 
+x=sym('x'); %Variable 'x' como simbolica
+
 %Solicito el método a utilizar
-metodo=input('\nSeleccione el método de interpolacion: (L/NGP/NGR)','s');
+metodo=input('\nSeleccione el método de interpolacion: (L/NG)','s');
 
 %Lagrange
 if strcmp(metodo,'L')
     fprintf('El metodo seleccionado es Lagrange\n')
     n=length(xi);
-    x=sym('x'); %esta funcion nos permite dejar la variable 'x' como simbolica
-    % y asi poder trabajar con ella, sin tener que asignarle un valor.
     for j=1:n
     producto=1;
     for i=1:j-1
@@ -38,17 +41,14 @@ if strcmp(metodo,'L')
     end
     L(j)=(producto*producto2)/(producto3*producto4); %calculos de las L para
     fprintf('\n L%d:\n',j-1) %poder hallar el polinomio
-    disp(L(j)) %la funcion dispo nos permite visualizar varibles o texto
-    % en el workspace
+    disp(L(j)) %visualizar varibles o texto en el workspace
     end
     pn=0;
     for j=1:n
     pn=pn+L(j)*yi(j); %calculo del polinomio interpolante
     end
     fprintf('\n POLINOMIO INTERPOLANTE: \n')
-    %disp(pn) % esta ejecucion la podemos utilizar cuando no necesitamos
-    %simplicar la expresion
-    pn = vpa(simplify(pn),10); %este comando nos permite simplificar toda la expresion
+    pn = vpa(simplify(pn),10); %simplifico la expresion
     disp(pn)
     
     %Especializar el polinomio en un punto K:
@@ -61,10 +61,52 @@ if strcmp(metodo,'L')
     end
 end
 
-if strcmp(metodo,'NGP')
-    fprintf('El metodo seleccionado es NGP')
+%Newton Gregory
+if strcmp(metodo,'NG')
+    fprintf('\nEl metodo seleccionado es NG')
+    
+n=length(xi)-1;
+prog_o_reg=input('\nIngrese 1 para newton progresivo o 0 para newton regresivo');
+DD=zeros(n+1);
+DD(:,1)=yi;
+for k=2:n+1
+    for J=k:n+1
+        DD(J,k)=[DD(J,k-1)-DD(J-1,k-1)]/[xi(J)-xi(J-k+1)];
+    end
+end
+disp('La matriz de diferencias divididas es:');
+disp(DD);
+disp('El polinomio de newton es');
+alto=length(DD(:,1));
+polnew=DD(1,1);
+P=1;
+for i=1:n
+    P=P*(x-xi(i));
+    if prog_o_reg == 1
+        mult = DD(i+1,i+1);
+    end
+    if prog_o_reg == 0
+        mult = DD(alto,i+1);
+    end
+    polnew=polnew+P*mult;
+end
+polnew=expand(polnew);
+%grado=length(polnew);
+pretty(polnew);
+
+%Me fijo si los puntos son equidistantes
+%Por ejemplo: si tomás 5 puntos, x1-x0=x2-x1=x3-x2=x4-x3
+
+    %Especializar el polinomio en un punto K:
+    opc=input('\nDesea aproximar un valor (si/no): ','s');
+    if strcmp(opc,'si')
+     x=input('\nIngrese el punto a aproximar: ');
+     y=eval(polnew); %evaluar el punto en el polinomio
+     fprintf('La aproximacion a f(x) es:')
+     disp(y)
+    end
 end
 
-if strcmp(metodo,'NGR')
-    fprintf('El metodo seleccionado es NGR')
+%Finalizar
+fin=input('\nDesea finalizar (si/no): ','s');
 end
